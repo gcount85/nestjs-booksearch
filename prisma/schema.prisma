@@ -13,7 +13,8 @@ datasource db {
 model User {
   id          Int     @default(autoincrement()) @id
   email       String  @unique
-  username    String?
+  providerId  String  @unique
+  username    String
   comments    Comment[] // 1:M 관계
   likedBooks  BookLike[] // BookLike를 통해 Book과 M:N 관계 
 }
