@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int     @default(autoincrement()) @id
+  email       String  @unique
+  username    String?
+  comments    Comment[] // 1:M 관계
+  likedBooks  BookLike[] // BookLike를 통해 Book과 M:N 관계 
+}
+
+model Comment {
+  id          Int      @default(autoincrement()) @id
+  content     String
+  userId      Int
+  bookId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  book        Book     @relation(fields: [bookId], references: [id])
+}
+
+model Book {
+  id          Int       @default(autoincrement()) @id
+  title       String
+  author      String
+  isbn        Int
+  description String
+  likedBy     BookLike[] // BookLike를 통해 User와 M:N 관계 
+  comments    Comment[]  // 코멘트와 1:M 관계
+}
+
+// User-Book 관계 테이블
+model BookLike {
+  userId  Int
+  bookId  Int
+  user    User @relation(fields: [userId], references: [id])
+  book    Book @relation(fields: [bookId], references: [id])
+
+  @@id([userId, bookId]) // 복합 PK
+}
