@@ -33,10 +33,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - name: configs 폴더로 이동
-        run: cd src/configs
-      - name: ls -a
-        run: ls -a
       - name: Install dependencies
         run: npm ci
       - name: Lint with ESlint
@@ -45,9 +41,9 @@ jobs:
         run: npm run format
       - name: Write config files
         run: |
-          echo "'$COMMON'" > src/configs/common.ts
-          echo "'$LOCAL'" > src/configs/local.ts
-          echo "'$DEV'" > src/configs/dev.ts
-          echo "'$PROD'" > src/configs/prod.ts
+          echo "$COMMON" > src/configs/common.ts
+          echo "$LOCAL" > src/configs/local.ts
+          echo "$DEV" > src/configs/dev.ts
+          echo "$PROD" > src/configs/prod.ts
       - name: Run build script
         run: npm run build --if-present
