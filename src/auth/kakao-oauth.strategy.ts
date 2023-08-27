@@ -29,14 +29,13 @@ export class KakaoOauthStrategy extends PassportStrategy(Strategy, 'kakao') {
     const displayName = profile.displayName;
     const email = profile._json.kakao_account.email;
     const providerId = profile.id;
-    console.log(profile);
     console.log('액세스 토큰', accessToken);
     console.log('리프레시 토큰', refreshToken);
 
     const user = await this.userService.findByEmailOrSave(
       email,
       displayName,
-      providerId,
+      providerId.toString(),
     );
 
     return user;

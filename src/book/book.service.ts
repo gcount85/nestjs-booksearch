@@ -9,6 +9,7 @@ import {
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { BookItemDTO } from './book.dto';
+import { CommentDto } from './comment.dto';
 
 @Injectable()
 export class BookService {
@@ -110,6 +111,55 @@ export class BookService {
       },
       include: {
         book: true,
+      },
+    });
+  }
+
+  // 책에 달린 코멘트 보기
+  async getCommentsOnBook(bookId: string) {
+    return await this.prisma.comment.findMany({
+      where: {
+        bookId: parseInt(bookId),
+      },
+    });
+  }
+
+  // 책에 코멘트 생성하기
+  async createCommentOnBook(bookId: string, commentDto: CommentDto, user) {
+    return await this.prisma.comment.create({
+      data: {
+        content: commentDto.content,
+        book: { connect: { id: parseInt(bookId) } },
+        user: { connect: { id: parseInt(user.id) } },
+      },
+      include: {
+        book: true,
+      },
+    });
+  }
+
+  // 책에 코멘트 수정하기
+  async updateCommentOnBook(commentId: string, commentDto: CommentDto) {
+    console.log(commentDto);
+    console.log(commentDto.content);
+
+    const result = await this.prisma.comment.update({
+      where: {
+        id: parseInt(commentId),
+      },
+      data: {
+        content: commentDto.content,
+      },
+    });
+
+    return result;
+  }
+
+  // 책에 코멘트 삭제하기
+  async deleteCommentOnBook(commentId: string) {
+    return await this.prisma.comment.delete({
+      where: {
+        id: parseInt(commentId),
       },
     });
   }

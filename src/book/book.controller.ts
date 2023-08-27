@@ -1,9 +1,20 @@
-import { Controller, Get, Query, Param, Body, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  Body,
+  Post,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { BookService } from './book.service';
 import {
   Book as BookModel,
   SelectedBook as SelectedBookModel,
+  Comment as CommentModel,
 } from '@prisma/client';
+import { CommentDto } from './comment.dto';
 
 @Controller('books')
 export class BookController {
@@ -36,9 +47,40 @@ export class BookController {
     return await this.bookService.getUsersLikedBook(userId);
   }
 
-  // 책에 좋아요 누르기
-  @Post(':bookId/like')
-  async updateBookLike(@Param('bookId') bookId: string, @Body() user) {
+  // 책에 좋아요 누르기 & 취소하기
+  @Post(':bookId/likes')
+  async updateBookLike(@Param('bookId') bookId: string, @Body('user') user) {
     return await this.bookService.updateBookLike(bookId, user);
+  }
+
+  // 책에 달린 코멘트 보기
+  @Get(':bookId/comments')
+  async getCommentsOnBook(@Param('bookId') bookId: string) {
+    return await this.bookService.getCommentsOnBook(bookId);
+  }
+
+  // 책에 코멘트 생성하기
+  @Post(':bookId/comments')
+  async createCommentOnBook(
+    @Param('bookId') bookId: string,
+    @Body('commentDto') commentDto: CommentDto,
+    @Body('user') user,
+  ) {
+    return await this.bookService.createCommentOnBook(bookId, commentDto, user);
+  }
+
+  // 책에 코멘트 수정하기
+  @Put(':bookId/comments/:commentId')
+  async updateCommentOnBook(
+    @Param('commentId') commentId: string,
+    @Body('commentDto') commentDto: CommentDto,
+  ) {
+    return await this.bookService.updateCommentOnBook(commentId, commentDto);
+  }
+
+  // 책에 코멘트 삭제하기
+  @Delete(':bookId/comments/:commentId')
+  async deleteCommentOnBook(@Param('commentId') commentId: string) {
+    return await this.bookService.deleteCommentOnBook(commentId);
   }
 }
