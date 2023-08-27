@@ -9,11 +9,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { BookService } from './book.service';
-import {
-  Book as BookModel,
-  SelectedBook as SelectedBookModel,
-  Comment as CommentModel,
-} from '@prisma/client';
+import { SelectedBook as SelectedBookModel } from '@prisma/client';
 import { CommentDto } from './comment.dto';
 
 @Controller('books')

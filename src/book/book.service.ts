@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
-  Book as BookModel,
   User as UserModel,
-  Prisma,
   SelectedBook as SelectedBookModel,
 } from '@prisma/client';
 import axios from 'axios';
