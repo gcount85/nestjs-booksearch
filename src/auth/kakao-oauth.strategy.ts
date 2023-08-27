@@ -36,7 +36,7 @@ export class KakaoOauthStrategy extends PassportStrategy(Strategy, 'kakao') {
     const user = await this.userService.findByEmailOrSave(
       email,
       displayName,
-      providerId.toString(),
+      providerId,
     );
 
     return user;
