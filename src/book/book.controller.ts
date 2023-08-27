@@ -35,4 +35,10 @@ export class BookController {
   async getUsersLikedBook(@Param('userId') userId: string) {
     return await this.bookService.getUsersLikedBook(userId);
   }
+
+  // 책에 좋아요 누르기
+  @Post(':bookId/like')
+  async updateBookLike(@Param('bookId') bookId: string, @Body() user) {
+    return await this.bookService.updateBookLike(bookId, user);
+  }
 }

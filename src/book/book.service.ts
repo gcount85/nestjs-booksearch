@@ -90,4 +90,27 @@ export class BookService {
       },
     });
   }
+
+  async updateBookLike(bookId: string, user) {
+    const existingLike = await this.prisma.bookLike.findFirst({
+      where: { userId: parseInt(user.id), bookId: parseInt(bookId) },
+    });
+
+    // 이미 좋아요를 눌렀으면 좋아요 취소
+    if (existingLike) {
+      return await this.prisma.bookLike.delete({
+        where: { booklikeSeq: existingLike.booklikeSeq },
+      });
+    }
+
+    return await this.prisma.bookLike.create({
+      data: {
+        userId: parseInt(user.id),
+        bookId: parseInt(bookId),
+      },
+      include: {
+        book: true,
+      },
+    });
+  }
 }
