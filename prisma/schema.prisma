@@ -33,7 +33,7 @@ model Book {
   id          Int       @default(autoincrement()) @id
   title       String
   author      String
-  isbn        Int
+  isbn        String
   description String
   likedBy     BookLike[] // BookLike를 통해 User와 M:N 관계 
   selectedBy  SelectedBook[]
@@ -42,20 +42,18 @@ model Book {
 
 // User-좋아요 책 관계 테이블
 model BookLike {
-  userId  Int
-  bookId  Int
-  user    User @relation(fields: [userId], references: [id])
-  book    Book @relation(fields: [bookId], references: [id])
-
-  @@id([userId, bookId]) // 복합 PK
+  booklikeSeq Int  @default(autoincrement()) @id 
+  userId      Int
+  bookId      Int
+  user        User @relation(fields: [userId], references: [id])
+  book        Book @relation(fields: [bookId], references: [id])
 }
 
 // User-Book 관계 테이블
 model SelectedBook {
-  userId  Int
-  bookId  Int
-  user    User @relation(fields: [userId], references: [id])
-  book    Book @relation(fields: [bookId], references: [id])
-
-  @@id([userId, bookId]) // 복합 PK
+  selectedBookSeq Int  @default(autoincrement()) @id 
+  userId          Int
+  bookId          Int
+  user            User @relation(fields: [userId], references: [id])
+  book            Book @relation(fields: [bookId], references: [id])
 }
