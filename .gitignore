@@ -1,7 +1,10 @@
 # environment variables
 .env
 envs
-configs
+common.ts
+local.ts
+dev.ts
+prod.ts
 
 # compiled output
 /dist

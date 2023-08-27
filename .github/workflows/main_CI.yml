@@ -15,6 +15,11 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env: # 환경 변수 설정
+      COMMON: ${{ secrets.COMMON }}
+      LOCAL: ${{ secrets.LOCAL }}
+      DEV: ${{ secrets.DEV }}
+      PROD: ${{ secrets.PROD }}
 
     strategy:
       matrix:
@@ -34,5 +39,7 @@ jobs:
         run: npm run lint
       - name: Format with Prettier
         run: npm run format
+      - name: Write config files
+        run: echo "'$COMMON'" > ./configs/common.ts && echo "'$LOCAL'" > ./configs/local.ts && echo "'$DEV'" > ./configs/dev.ts && echo "'$PROD'" > ./configs/prod.ts
       - name: Run build script
         run: npm run build --if-present
