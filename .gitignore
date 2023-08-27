@@ -5,6 +5,7 @@ common.ts
 local.ts
 dev.ts
 prod.ts
+setup_postgres.sh
 
 # compiled output
 /dist
