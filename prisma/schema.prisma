@@ -17,6 +17,7 @@ model User {
   username    String
   comments    Comment[] // 1:M 관계
   likedBooks  BookLike[] // BookLike를 통해 Book과 M:N 관계 
+  selectedBooks SelectedBook[]
 }
 
 model Comment {
@@ -35,11 +36,22 @@ model Book {
   isbn        Int
   description String
   likedBy     BookLike[] // BookLike를 통해 User와 M:N 관계 
+  selectedBy  SelectedBook[]
   comments    Comment[]  // 코멘트와 1:M 관계
 }
 
-// User-Book 관계 테이블
+// User-좋아요 책 관계 테이블
 model BookLike {
+  userId  Int
+  bookId  Int
+  user    User @relation(fields: [userId], references: [id])
+  book    Book @relation(fields: [bookId], references: [id])
+
+  @@id([userId, bookId]) // 복합 PK
+}
+
+// User-Book 관계 테이블
+model SelectedBook {
   userId  Int
   bookId  Int
   user    User @relation(fields: [userId], references: [id])
