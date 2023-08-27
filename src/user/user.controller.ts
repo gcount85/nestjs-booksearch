@@ -6,6 +6,11 @@ import { User as UserModel } from '@prisma/client';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Get()
+  async getAllUsers(): Promise<UserModel[]> {
+    return await this.userService.getAllUsers();
+  }
+
   @Get(':email')
   async getUser(@Param('email') email: string): Promise<UserModel> {
     return await this.userService.getUser(email);
