@@ -32,8 +32,7 @@ export class BookService {
         `https://openapi.naver.com/v1/search/book.json?query=${query}`,
         config,
       );
-      console.log(response.data);
-      //   return response.data;
+      return response.data;
     } catch (error) {
       throw new Error('Failed to fetch book data from naver');
     }
@@ -68,5 +67,27 @@ export class BookService {
         });
       }),
     );
+  }
+
+  async getUsersSelectedBook(userId: string) {
+    return await this.prisma.selectedBook.findMany({
+      where: {
+        userId: parseInt(userId),
+      },
+      include: {
+        book: true, // Book 테이블을 join
+      },
+    });
+  }
+
+  async getUsersLikedBook(userId: string) {
+    return await this.prisma.bookLike.findMany({
+      where: {
+        userId: parseInt(userId),
+      },
+      include: {
+        book: true, // Book 테이블을 join
+      },
+    });
   }
 }

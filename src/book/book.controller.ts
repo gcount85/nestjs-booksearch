@@ -23,4 +23,16 @@ export class BookController {
   ): Promise<SelectedBookModel[]> {
     return await this.bookService.saveSelectedBook(user, bookItemDto);
   }
+
+  // 유저가 선택한 책 리스트를 받아서 DB에 저장
+  @Get('selected/:userId')
+  async getUsersSelectedBook(@Param('userId') userId: string) {
+    return await this.bookService.getUsersSelectedBook(userId);
+  }
+
+  // 유저가 좋아요 한 책 리스트 조회하기
+  @Get('liked/:userId')
+  async getUsersLikedBook(@Param('userId') userId: string) {
+    return await this.bookService.getUsersLikedBook(userId);
+  }
 }
