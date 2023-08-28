@@ -1,5 +1,5 @@
-import { IsString, ValidateNested } from "class-validator";
-import { UserResponseDto } from "src/user/user.dto";
+import { IsString, ValidateNested } from 'class-validator';
+import { UserResponseDto } from 'src/user/user.dto';
 
 export class BookItemDTO {
   title: string;
@@ -36,8 +36,17 @@ export class SelectedBookDto {
   userId: number;
   bookId: number;
   @ValidateNested()
-  book?: BookDto
+  book?: BookDto;
   @ValidateNested()
-  user?: UserResponseDto
+  user?: UserResponseDto;
 }
 
+export class BookLikeDto {
+  booklikeSeq: number;
+  userId: number;
+  bookId: number;
+  @ValidateNested()
+  book?: BookDto;
+  @ValidateNested()
+  user?: UserResponseDto;
+}

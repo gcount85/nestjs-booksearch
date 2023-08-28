@@ -3,11 +3,18 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   User as UserModel,
   SelectedBook as SelectedBookModel,
-  Book as BookModel
+  Book as BookModel,
+  BookLike as BookLikeModel,
+  Comment as CommentModel,
 } from '@prisma/client';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { BookItemDTO, BookItemsDTO, SelectedBookDto } from './book.dto';
+import {
+  BookItemDTO,
+  BookItemsDTO,
+  BookLikeDto,
+  SelectedBookDto,
+} from './book.dto';
 import { CommentDto } from './comment.dto';
 
 @Injectable()
@@ -17,19 +24,46 @@ export class BookService {
     private configService: ConfigService,
   ) {}
 
-  transformModelToSelectedBookDto(selectedBookModel: SelectedBookModel){
-    if (!selectedBookModel){
-      return null
+  transformModelToSelectedBookDto(selectedBookModel: SelectedBookModel) {
+    if (!selectedBookModel) {
+      return null;
     }
     const selectedBookDto = new SelectedBookDto();
-    selectedBookDto.selectedBookSeq = selectedBookModel.selectedBookSeq
-    selectedBookDto.userId = selectedBookModel.userId || undefined
+    selectedBookDto.selectedBookSeq = selectedBookModel.selectedBookSeq;
+    selectedBookDto.userId = selectedBookModel.userId || undefined;
     selectedBookDto.bookId = selectedBookModel.bookId;
     selectedBookDto.book = selectedBookModel.book || undefined;
     selectedBookDto.user = selectedBookModel.user || undefined;
     return selectedBookDto;
   }
 
+  transformModelToBookLikeDto(bookLikeModel: BookLikeModel) {
+    if (!bookLikeModel) {
+      return null;
+    }
+    const bookLikeDto = new BookLikeDto();
+    bookLikeDto.booklikeSeq = bookLikeModel.booklikeSeq;
+    bookLikeDto.userId = bookLikeModel.userId || undefined;
+    bookLikeDto.bookId = bookLikeModel.bookId;
+    bookLikeDto.book = bookLikeModel.book || undefined;
+    bookLikeDto.user = bookLikeModel.user || undefined;
+    return bookLikeDto;
+  }
+
+  // TODO : undefined 확인
+  transformModelToCommentDto(commentModel: CommentModel) {
+    if (!commentModel) {
+      return null;
+    }
+    const commentDto = new CommentDto();
+    commentDto.id = commentModel.id || undefined;
+    commentDto.content = commentModel.content;
+    commentDto.userId = commentModel.userId || undefined;
+    commentDto.bookId = commentModel.bookId || undefined;
+    commentDto.createdAt = commentModel.createdAt || undefined;
+    commentDto.updatedAt = commentModel.updatedAt;
+    return commentDto;
+  }
 
   async searchNaverBooks(query: string): Promise<BookItemsDTO> {
     try {
@@ -79,50 +113,69 @@ export class BookService {
           },
           include: {
             book: true,
-            user: true
-          }
+            user: true,
+          },
         });
       }),
     );
 
-    return selectedBookModels
+    const selectedBookDtos: SelectedBookDto[] = selectedBookModels.map(
+      this.transformModelToSelectedBookDto,
+    );
+    return selectedBookDtos;
   }
 
-  async getUsersSelectedBook(userId: string) {
-    return await this.prisma.selectedBook.findMany({
-      where: {
-        userId: parseInt(userId),
-      },
-      include: {
-        book: true, // Book 테이블을 join
-      },
-    });
+  async getUsersSelectedBook(userId: string): Promise<SelectedBookDto[]> {
+    const selectedBookModels: SelectedBookModel[] =
+      await this.prisma.selectedBook.findMany({
+        where: {
+          userId: parseInt(userId),
+        },
+        include: {
+          book: true, // Book 테이블을 join
+        },
+      });
+
+    const selectedBookDtos: SelectedBookDto[] = selectedBookModels.map(
+      this.transformModelToSelectedBookDto,
+    );
+    return selectedBookDtos;
   }
 
-  async getUsersLikedBook(userId: string) {
-    return await this.prisma.bookLike.findMany({
-      where: {
-        userId: parseInt(userId),
+  async getUsersLikedBook(userId: string): Promise<BookLikeDto[]> {
+    const bookLikeModels: BookLikeModel[] = await this.prisma.bookLike.findMany(
+      {
+        where: {
+          userId: parseInt(userId),
+        },
+        include: {
+          book: true, // Book 테이블을 join
+        },
       },
-      include: {
-        book: true, // Book 테이블을 join
-      },
-    });
+    );
+
+    const bookLikeDtos: BookLikeDto[] = bookLikeModels.map(
+      this.transformModelToBookLikeDto,
+    );
+    return bookLikeDtos;
   }
 
-  async updateBookLike(bookId: string, user) {
+  // TODO : user 타입 붙이기
+  async updateBookLike(bookId: string, user): Promise<BookLikeModel> {
     const existingLike = await this.prisma.bookLike.findFirst({
       where: { userId: parseInt(user.id), bookId: parseInt(bookId) },
     });
 
+    let bookLikeModel = undefined;
+
     // 이미 좋아요를 눌렀으면 좋아요 취소
     if (existingLike) {
-      return await this.prisma.bookLike.delete({
+      bookLikeModel = await this.prisma.bookLike.delete({
         where: { booklikeSeq: existingLike.booklikeSeq },
       });
     }
 
-    return await this.prisma.bookLike.create({
+    bookLikeModel = await this.prisma.bookLike.create({
       data: {
         userId: parseInt(user.id),
         bookId: parseInt(bookId),
@@ -131,20 +184,27 @@ export class BookService {
         book: true,
       },
     });
+
+    const bookLikeDto = this.transformModelToBookLikeDto(bookLikeModel);
+    return bookLikeDto;
   }
 
   // 책에 달린 코멘트 보기
-  async getCommentsOnBook(bookId: string) {
-    return await this.prisma.comment.findMany({
+  async getCommentsOnBook(bookId: string): Promise<CommentDto[]> {
+    const commentModel: CommentModel[] = await this.prisma.comment.findMany({
       where: {
         bookId: parseInt(bookId),
       },
     });
+    const commentDtos: CommentDto[] = commentModel.map(
+      this.transformModelToCommentDto,
+    );
+    return commentDtos;
   }
 
   // 책에 코멘트 생성하기
   async createCommentOnBook(bookId: string, commentDto: CommentDto, user) {
-    return await this.prisma.comment.create({
+    const commentModel = await this.prisma.comment.create({
       data: {
         content: commentDto.content,
         book: { connect: { id: parseInt(bookId) } },
@@ -154,6 +214,8 @@ export class BookService {
         book: true,
       },
     });
+    const commentResponseDto = this.transformModelToCommentDto(commentModel);
+    return commentResponseDto;
   }
 
   // 책에 코멘트 수정하기

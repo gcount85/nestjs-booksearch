@@ -30,7 +30,7 @@ EXPOSE 3000
 
 # PostgreSQL setup: 복사하고 권한 설정 후 스크립트 실행
 RUN chmod +x ./setup_postgres.sh && \
-    ./setup_postgres.she
+    ./setup_postgres.sh
 
 # Prisma migration
 RUN service postgresql start && \
