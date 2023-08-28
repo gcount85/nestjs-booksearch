@@ -21,7 +21,6 @@ export class SessionSerializer extends PassportSerializer {
     }
 
     // 유저 정보가 있다면 유저 정보 반환
-    const { providerId, ...userInfo } = user;
-    done(null, userInfo);
+    done(null, user);
   }
 }

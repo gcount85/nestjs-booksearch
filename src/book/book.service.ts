@@ -189,6 +189,27 @@ export class BookService {
     return bookLikeDto;
   }
 
+  // 책에 코멘트 생성하기
+  // TODO : User 타입 추가하기
+  async createCommentOnBook(
+    bookId: string,
+    comment: CommentDto,
+    user,
+  ): Promise<CommentDto> {
+    const commentModel = await this.prisma.comment.create({
+      data: {
+        content: comment.content,
+        book: { connect: { id: parseInt(bookId) } },
+        user: { connect: { id: parseInt(user.id) } },
+      },
+      include: {
+        book: true,
+      },
+    });
+    const commentDto = this.transformModelToCommentDto(commentModel);
+    return commentDto;
+  }
+
   // 책에 달린 코멘트 보기
   async getCommentsOnBook(bookId: string): Promise<CommentDto[]> {
     const commentModel: CommentModel[] = await this.prisma.comment.findMany({
@@ -202,45 +223,32 @@ export class BookService {
     return commentDtos;
   }
 
-  // 책에 코멘트 생성하기
-  async createCommentOnBook(bookId: string, commentDto: CommentDto, user) {
-    const commentModel = await this.prisma.comment.create({
-      data: {
-        content: commentDto.content,
-        book: { connect: { id: parseInt(bookId) } },
-        user: { connect: { id: parseInt(user.id) } },
-      },
-      include: {
-        book: true,
-      },
-    });
-    const commentResponseDto = this.transformModelToCommentDto(commentModel);
-    return commentResponseDto;
-  }
-
   // 책에 코멘트 수정하기
-  async updateCommentOnBook(commentId: string, commentDto: CommentDto) {
-    console.log(commentDto);
-    console.log(commentDto.content);
-
-    const result = await this.prisma.comment.update({
+  async updateCommentOnBook(
+    commentId: string,
+    comment: CommentDto,
+  ): Promise<CommentDto> {
+    const commentModel = await this.prisma.comment.update({
       where: {
         id: parseInt(commentId),
       },
       data: {
-        content: commentDto.content,
+        content: comment.content,
       },
     });
 
-    return result;
+    const commentDto = this.transformModelToCommentDto(commentModel);
+    return commentDto;
   }
 
   // 책에 코멘트 삭제하기
-  async deleteCommentOnBook(commentId: string) {
-    return await this.prisma.comment.delete({
+  async deleteCommentOnBook(commentId: string): Promise<CommentDto> {
+    const commentModel = await this.prisma.comment.delete({
       where: {
         id: parseInt(commentId),
       },
     });
+    const commentDto = this.transformModelToCommentDto(commentModel);
+    return commentDto;
   }
 }
