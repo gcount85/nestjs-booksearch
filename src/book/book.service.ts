@@ -95,9 +95,9 @@ export class BookService {
     }
   }
 
-  async saveSelectedBook(
-    user: UserModel,
+  async saveSelectedBookByUser(
     bookItemDtos: BookItemDTO[],
+    userId: string,
   ): Promise<SelectedBookModel[]> {
     // 1. 선택한 책을 책 테이블에 저장합니다
     const createdBooks: BookModel[] = await Promise.all(
@@ -118,7 +118,7 @@ export class BookService {
       createdBooks.map(async (book) => {
         return this.prisma.selectedBook.create({
           data: {
-            userId: user.id,
+            userId: parseInt(userId),
             bookId: book.id,
           },
           include: {
@@ -135,7 +135,7 @@ export class BookService {
     return selectedBookDtos;
   }
 
-  async getUsersSelectedBook(userId: string): Promise<SelectedBookDto[]> {
+  async getSelectedBooksByUser(userId: string): Promise<SelectedBookDto[]> {
     const selectedBookModels: SelectedBookModel[] =
       await this.prisma.selectedBook.findMany({
         where: {
@@ -152,7 +152,7 @@ export class BookService {
     return selectedBookDtos;
   }
 
-  async getUsersLikedBook(userId: string): Promise<BookLikeDto[]> {
+  async getBooksLikedByUser(userId: string): Promise<BookLikeDto[]> {
     const bookLikeModels: BookLikeModel[] = await this.prisma.bookLike.findMany(
       {
         where: {
@@ -170,10 +170,9 @@ export class BookService {
     return bookLikeDtos;
   }
 
-  // TODO : user 타입 붙이기
-  async updateBookLike(bookId: string, user): Promise<BookLikeModel> {
+  async updateBookLike(bookId: string, userId: string): Promise<BookLikeModel> {
     const existingLike = await this.prisma.bookLike.findFirst({
-      where: { userId: parseInt(user.id), bookId: parseInt(bookId) },
+      where: { userId: parseInt(userId), bookId: parseInt(bookId) },
     });
 
     let bookLikeModel = undefined;
@@ -187,7 +186,7 @@ export class BookService {
 
     bookLikeModel = await this.prisma.bookLike.create({
       data: {
-        userId: parseInt(user.id),
+        userId: parseInt(userId),
         bookId: parseInt(bookId),
       },
       include: {
@@ -200,17 +199,16 @@ export class BookService {
   }
 
   // 책에 코멘트 생성하기
-  // TODO : User 타입 추가하기
   async createCommentOnBook(
     bookId: string,
     comment: CommentDto,
-    user,
+    userId: string,
   ): Promise<CommentDto> {
     const commentModel = await this.prisma.comment.create({
       data: {
         content: comment.content,
         book: { connect: { id: parseInt(bookId) } },
-        user: { connect: { id: parseInt(user.id) } },
+        user: { connect: { id: parseInt(userId) } },
       },
       include: {
         book: true,

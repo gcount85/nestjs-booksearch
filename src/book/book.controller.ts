@@ -29,49 +29,47 @@ export class BookController {
   }
 
   // 유저가 선택한 책 리스트를 받아서 DB에 저장
-  @Post()
-  async saveSelectedBook(
+  @Post('selected/:userId')
+  async saveSelectedBookByUser(
     @Body('bookItemDtos') bookItemDtos: BookItemDTO[],
-    @Body('user') user, // TODO: user 타입 붙이기
+    @Param('userId') userId: string,
   ): Promise<SelectedBookDto[]> {
-    return await this.bookService.saveSelectedBook(user, bookItemDtos);
+    return await this.bookService.saveSelectedBookByUser(bookItemDtos, userId);
   }
 
   // 유저가 저장한 책 리스트 DB에서 조회
   @Get('selected/:userId')
-  async getUsersSelectedBook(
+  async getSelectedBooksByUser(
     @Param('userId') userId: string,
   ): Promise<SelectedBookDto[]> {
-    return await this.bookService.getUsersSelectedBook(userId);
+    return await this.bookService.getSelectedBooksByUser(userId);
   }
 
   // 유저가 좋아요 한 책 리스트 조회하기
   @Get('liked/:userId')
-  async getUsersLikedBook(
+  async getBooksLikedByUser(
     @Param('userId') userId: string,
   ): Promise<BookLikeDto[]> {
-    return await this.bookService.getUsersLikedBook(userId);
+    return await this.bookService.getBooksLikedByUser(userId);
   }
 
   // 책에 좋아요 누르기 & 취소하기
-  // TODO : user 타입 붙이기
   @Post(':bookId/likes')
   async updateBookLike(
     @Param('bookId') bookId: string,
-    @Body('user') user,
+    @Body('userId') userId: string,
   ): Promise<BookLikeDto> {
-    return await this.bookService.updateBookLike(bookId, user);
+    return await this.bookService.updateBookLike(bookId, userId);
   }
 
   // 책에 코멘트 생성하기
-  // TODO : User 타입 붙이기
   @Post(':bookId/comments')
   async createCommentOnBook(
     @Param('bookId') bookId: string,
     @Body('comment') comment: CommentDto,
-    @Body('user') user,
+    @Body('user') userId: string,
   ): Promise<CommentDto> {
-    return await this.bookService.createCommentOnBook(bookId, comment, user);
+    return await this.bookService.createCommentOnBook(bookId, comment, userId);
   }
 
   // 책에 달린 코멘트 보기
