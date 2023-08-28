@@ -17,6 +17,16 @@ import {
 } from './book.dto';
 import { CommentDto } from './comment.dto';
 
+type SelectedBookWithBookUser = SelectedBookModel & {
+  book?: BookModel;
+  user?: UserModel;
+};
+
+type BookLikeModelWithBookUser = BookLikeModel & {
+  book?: BookModel;
+  user?: UserModel;
+};
+
 @Injectable()
 export class BookService {
   constructor(
@@ -24,7 +34,7 @@ export class BookService {
     private configService: ConfigService,
   ) {}
 
-  transformModelToSelectedBookDto(selectedBookModel: SelectedBookModel) {
+  transformModelToSelectedBookDto(selectedBookModel: SelectedBookWithBookUser) {
     if (!selectedBookModel) {
       return null;
     }
@@ -37,7 +47,7 @@ export class BookService {
     return selectedBookDto;
   }
 
-  transformModelToBookLikeDto(bookLikeModel: BookLikeModel) {
+  transformModelToBookLikeDto(bookLikeModel: BookLikeModelWithBookUser) {
     if (!bookLikeModel) {
       return null;
     }
