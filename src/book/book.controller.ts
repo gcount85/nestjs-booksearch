@@ -11,6 +11,7 @@ import {
 import { BookService } from './book.service';
 import { SelectedBook as SelectedBookModel } from '@prisma/client';
 import { CommentDto } from './comment.dto';
+import { BookItemDTO, BookItemsDTO } from './book.dto';
 
 @Controller('books')
 export class BookController {
@@ -19,16 +20,17 @@ export class BookController {
   // GET localhost:3000/books/search?query=철학
   // 네이버 책 검색 결과 디폴트 10개 반환
   @Get('search')
-  async searchNaverBooks(@Query('query') query: string) {
+  async searchNaverBooks(@Query('query') query: string): Promise<BookItemsDTO> {
     return await this.bookService.searchNaverBooks(query);
   }
 
   // 유저가 선택한 책 리스트를 받아서 DB에 저장
   @Post()
   async saveSelectedBook(
-    @Body() { bookItemDto, user },
+    @Body('bookItemDtos') bookItemDtos: BookItemDTO[], 
+    @Body('user') user,
   ): Promise<SelectedBookModel[]> {
-    return await this.bookService.saveSelectedBook(user, bookItemDto);
+    return await this.bookService.saveSelectedBook(user, bookItemDtos);
   }
 
   // 유저가 선택한 책 리스트를 받아서 DB에 저장

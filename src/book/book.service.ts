@@ -3,10 +3,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import {
   User as UserModel,
   SelectedBook as SelectedBookModel,
+  Book as BookModel
 } from '@prisma/client';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { BookItemDTO } from './book.dto';
+import { BookItemDTO, BookItemsDTO, SelectedBookDto } from './book.dto';
 import { CommentDto } from './comment.dto';
 
 @Injectable()
@@ -16,8 +17,21 @@ export class BookService {
     private configService: ConfigService,
   ) {}
 
-  // 책 response dto 만들기
-  async searchNaverBooks(query: string): Promise<any> {
+  transformModelToSelectedBookDto(selectedBookModel: SelectedBookModel){
+    if (!selectedBookModel){
+      return null
+    }
+    const selectedBookDto = new SelectedBookDto();
+    selectedBookDto.selectedBookSeq = selectedBookModel.selectedBookSeq
+    selectedBookDto.userId = selectedBookModel.userId || undefined
+    selectedBookDto.bookId = selectedBookModel.bookId;
+    selectedBookDto.book = selectedBookModel.book || undefined;
+    selectedBookDto.user = selectedBookModel.user || undefined;
+    return selectedBookDto;
+  }
+
+
+  async searchNaverBooks(query: string): Promise<BookItemsDTO> {
     try {
       const config = {
         headers: {
@@ -39,11 +53,11 @@ export class BookService {
 
   async saveSelectedBook(
     user: UserModel,
-    bookItemDto: BookItemDTO[],
+    bookItemDtos: BookItemDTO[],
   ): Promise<SelectedBookModel[]> {
     // 1. 선택한 책을 책 테이블에 저장합니다
-    const createdBooks = await Promise.all(
-      bookItemDto.map(async (item) => {
+    const createdBooks: BookModel[] = await Promise.all(
+      bookItemDtos.map(async (item) => {
         return this.prisma.book.create({
           data: {
             title: item.title,
@@ -56,16 +70,22 @@ export class BookService {
     );
 
     // 2. 생성된 책과 사용자의 관계를 설정합니다.
-    return await Promise.all(
+    const selectedBookModels: SelectedBookModel[] = await Promise.all(
       createdBooks.map(async (book) => {
         return this.prisma.selectedBook.create({
           data: {
             userId: user.id,
             bookId: book.id,
           },
+          include: {
+            book: true,
+            user: true
+          }
         });
       }),
     );
+
+    return selectedBookModels
   }
 
   async getUsersSelectedBook(userId: string) {
