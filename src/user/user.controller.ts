@@ -1,25 +1,26 @@
 import { Param, Controller, Get, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User as UserModel } from '@prisma/client';
+import { UserResponseDto } from './user.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  async getAllUsers(): Promise<UserModel[]> {
+  async getAllUsers(): Promise<UserResponseDto[]> {
     return await this.userService.getAllUsers();
   }
 
   @Get(':email')
-  async getUser(@Param('email') email: string): Promise<UserModel> {
+  async getUser(@Param('email') email: string): Promise<UserResponseDto> {
     return await this.userService.getUser(email);
   }
 
   @Post()
   async signupUser(
-    @Body() userData: { username: string; email: string; providerId: string },
-  ): Promise<UserModel> {
-    return this.userService.createUser(userData);
+    @Body() userCreateDto: { username: string; email: string; providerId: string },
+  ): Promise<UserResponseDto> {
+    return this.userService.createUser(userCreateDto);
   }
 }
