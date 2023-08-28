@@ -1,4 +1,4 @@
-import { IsString, ValidateNested } from 'class-validator';
+import { IsNumberString, ValidateNested } from 'class-validator';
 import { UserResponseDto } from 'src/user/user.dto';
 
 export class BookItemDTO {
@@ -9,7 +9,7 @@ export class BookItemDTO {
   discount: string;
   publisher: string;
   pubdate: string;
-  @IsString()
+  @IsNumberString()
   isbn: string;
   description: string;
 }

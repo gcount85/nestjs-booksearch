@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -9,6 +10,9 @@ import * as passport from 'passport';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+
+  // 전역 파이프로 ValidationPipe 객체 추가
+  app.useGlobalPipes(new ValidationPipe());
 
   // set static files
   app.useStaticAssets(join(__dirname, '..', 'public'));
