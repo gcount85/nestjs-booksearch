@@ -1,11 +1,25 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class CommentDto {
-  id?: number;
+export class CreateCommentDto {
   @IsNotEmpty()
   content: string;
-  userId?: number;
-  bookId?: number;
-  createdAt?: Date;
+  @IsNumber()
+  userId: number;
+  @IsNumber()
+  bookId: number;
+}
+
+export class UpdateCommentDto {
+  @IsNotEmpty()
+  content: string;
+}
+
+export class CommentDto {
+  id: number;
+  @IsNotEmpty()
+  content: string;
+  userId: number;
+  bookId: number;
+  createdAt: Date;
   updatedAt?: Date;
 }

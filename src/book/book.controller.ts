@@ -9,7 +9,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { BookService } from './book.service';
-import { CommentDto } from './comment.dto';
+import { CommentDto, CreateCommentDto, UpdateCommentDto } from './comment.dto';
 import {
   BookItemDTO,
   BookItemsDTO,
@@ -21,7 +21,6 @@ import {
 export class BookController {
   constructor(private bookService: BookService) {}
 
-  // GET localhost:3000/books/search?query=철학
   // 네이버 책 검색 결과 디폴트 10개 반환
   @Get('search')
   async searchNaverBooks(@Query('query') query: string): Promise<BookItemsDTO> {
@@ -66,7 +65,7 @@ export class BookController {
   @Post(':bookId/comments')
   async createCommentOnBook(
     @Param('bookId') bookId: string,
-    @Body('comment') comment: CommentDto,
+    @Body('comment') comment: CreateCommentDto,
     @Body('userId') userId: string,
   ): Promise<CommentDto> {
     return await this.bookService.createCommentOnBook(bookId, comment, userId);
@@ -84,7 +83,7 @@ export class BookController {
   @Put(':bookId/comments/:commentId')
   async updateCommentOnBook(
     @Param('commentId') commentId: string,
-    @Body('comment') comment: CommentDto,
+    @Body('comment') comment: UpdateCommentDto,
   ): Promise<CommentDto> {
     return await this.bookService.updateCommentOnBook(commentId, comment);
   }
