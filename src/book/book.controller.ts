@@ -67,7 +67,7 @@ export class BookController {
   async createCommentOnBook(
     @Param('bookId') bookId: string,
     @Body('comment') comment: CommentDto,
-    @Body('user') userId: string,
+    @Body('userId') userId: string,
   ): Promise<CommentDto> {
     return await this.bookService.createCommentOnBook(bookId, comment, userId);
   }

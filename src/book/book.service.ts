@@ -91,6 +91,7 @@ export class BookService {
       );
       return response.data;
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to fetch book data from naver');
     }
   }
