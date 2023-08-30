@@ -79,7 +79,7 @@ jobs:
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         env:
-          AWS_REGION: ${{ env.AWS_REGION }}
+          AWS_REGION: us-west-2
 
       # - name: Debugging step
       #   run: |
