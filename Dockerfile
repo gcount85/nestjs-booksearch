@@ -9,7 +9,7 @@ WORKDIR /nestjs-booksearch
 RUN apt-get update && \
     apt-get install -y curl gnupg lsb-release wget && \
     curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs postgresql postgresql-contrib && \
+    apt-get install -y nodejs && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -28,13 +28,5 @@ COPY . .
 # Expose the port the app will run on
 EXPOSE 3000
 
-# PostgreSQL setup: 복사하고 권한 설정 후 스크립트 실행
-RUN chmod +x ./setup_postgres.sh && \
-    ./setup_postgres.sh
-
-# Prisma migration
-RUN service postgresql start && \
-    npx prisma migrate dev --name init-docker
-
 # Command to run the application
-CMD service postgresql start && npm run start
+CMD npm run build && npm run start:prod
