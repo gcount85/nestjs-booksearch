@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: us-east-2 # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: public.ecr.aws/h6e3k5d5/nestjsbooksearch-ecr # set this to your Amazon ECR repository name
+  ECR_REPOSITORY: nestjsbooksearch-ecr # set this to your Amazon ECR repository name
   ECS_SERVICE: NestjsBooksearchService # set this to your Amazon ECS service name
   ECS_CLUSTER: NestjsBooksearchCluster # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION:
@@ -65,11 +65,13 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
 
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: public.ecr.aws/h6e3k5d5/nestjsbooksearch-ecr
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
