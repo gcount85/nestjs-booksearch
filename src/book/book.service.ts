@@ -95,6 +95,7 @@ export class BookService {
       );
       return response.data;
     } catch (error) {
+      console.log('!!!!!!!!!!!!!! ', query);
       console.log(error);
       throw new InternalServerErrorException(
         '네이버 책 검색 결과 가져오기 실패',
