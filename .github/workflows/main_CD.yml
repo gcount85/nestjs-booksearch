@@ -70,6 +70,10 @@ jobs:
         with:
           registry-type: public
 
+      - name: Debugging step
+        run: |
+          echo "AWS_REGION is ${{ env.AWS_REGION }}, Registry is ${{ steps.login-ecr-public.outputs.registry }}"
+
       - name: Build, tag, and push docker image to Amazon ECR Public
         env:
           IMAGE_TAG: ${{ github.sha }}
