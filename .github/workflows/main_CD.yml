@@ -33,6 +33,7 @@ on:
 env:
   AWS_REGION: us-east-2 # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: nestjsbooksearch-ecr # set this to your Amazon ECR repository name
+  REGISTRY_ALIAS: h6e3k5d5
   ECS_SERVICE: NestjsBooksearchService # set this to your Amazon ECS service name
   ECS_CLUSTER: NestjsBooksearchCluster # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION:
@@ -56,9 +57,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::371252027408:user/NestjsBooksearchIAM
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
@@ -72,7 +74,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: h6e3k5d5
+          REGISTRY_ALIAS: ${{ env.REGISTRY_ALIAS }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
