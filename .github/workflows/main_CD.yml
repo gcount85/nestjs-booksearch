@@ -68,7 +68,7 @@ jobs:
         id: login-ecr-public
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          registry-type: public
+          mask-password: 'true'
 
       - name: Debugging step
         run: |
