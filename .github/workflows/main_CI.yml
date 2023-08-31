@@ -39,7 +39,7 @@ jobs:
         run: npm run format
       - name: Write config files
         run: |
-          echo "$DEV" > src/envs/dev.env
-          echo "$PROD" > src/envs/prod.env
+          echo "$DEV" > envs/dev.env
+          echo "$PROD" > envs/prod.env
       - name: Run build script
         run: npm run build --if-present
