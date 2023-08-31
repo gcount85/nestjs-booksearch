@@ -15,7 +15,7 @@ export class KakaoOauthStrategy extends PassportStrategy(Strategy, 'kakao') {
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'), // REST API 키
       clientSecret: configService.get('KAKAO_CLIENT_SECRET'),
-      callbackURL: 'http://localhost:3000/auth/oauth/kakao', // 카카오 OAuth 인증 후 실행되는 URL
+      callbackURL: `${configService.get('SERVICE_URL')}/auth/oauth/kakao`, // 카카오 OAuth 인증 후 실행되는 URL
     });
   }
 
