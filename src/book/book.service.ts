@@ -14,6 +14,7 @@ import {
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import {
+  BookDto,
   BookItemDTO,
   BookItemsDTO,
   BookLikeDto,
@@ -37,6 +38,19 @@ export class BookService {
     private prisma: PrismaService,
     private configService: ConfigService,
   ) {}
+
+  transformModelToBookDto(bookModel: BookModel) {
+    if (!bookModel) {
+      return null;
+    }
+    const bookDto = new BookDto();
+    bookDto.id = bookModel.id;
+    bookDto.title = bookModel.title;
+    bookDto.author = bookModel.author;
+    bookDto.isbn = bookModel.isbn;
+    bookDto.description = bookModel.description;
+    return bookDto;
+  }
 
   transformModelToSelectedBookDto(selectedBookModel: SelectedBookWithBookUser) {
     if (!selectedBookModel) {
@@ -64,17 +78,16 @@ export class BookService {
     return bookLikeDto;
   }
 
-  // TODO : undefined 확인
   transformModelToCommentDto(commentModel: CommentModel) {
     if (!commentModel) {
       return null;
     }
     const commentDto = new CommentDto();
-    commentDto.id = commentModel.id || undefined;
+    commentDto.id = commentModel.id;
     commentDto.content = commentModel.content;
-    commentDto.userId = commentModel.userId || undefined;
-    commentDto.bookId = commentModel.bookId || undefined;
-    commentDto.createdAt = commentModel.createdAt || undefined;
+    commentDto.userId = commentModel.userId;
+    commentDto.bookId = commentModel.bookId;
+    commentDto.createdAt = commentModel.createdAt;
     commentDto.updatedAt = commentModel.updatedAt;
     return commentDto;
   }
@@ -103,6 +116,46 @@ export class BookService {
     }
   }
 
+  async getAllBooks() {
+    let bookModels: BookModel[];
+
+    try {
+      bookModels = await this.prisma.book.findMany();
+    } catch (error) {
+      throw new InternalServerErrorException('book 검색 중 에러');
+    }
+
+    if (!bookModels) {
+      throw new NotFoundException('저장된 책이 없습니다.');
+    }
+
+    const bookDto = bookModels.map(this.transformModelToBookDto);
+    return bookDto;
+  }
+
+  async deleteBookByBookId(bookId: string) {
+    let bookModel: BookModel;
+
+    try {
+      bookModel = await this.prisma.book.delete({
+        where: {
+          id: parseInt(bookId),
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'book 삭제 중 에러. 유저와 관계가 있는 책일 수 있습니다. ',
+      );
+    }
+
+    if (!bookModel) {
+      throw new NotFoundException('찾고자 하는 책이 없습니다.');
+    }
+
+    const bookDto = this.transformModelToBookDto(bookModel);
+    return bookDto;
+  }
+
   async saveSelectedBookByUser(
     bookItemDtos: BookItemDTO[],
     userId: string,
@@ -113,7 +166,13 @@ export class BookService {
       // 1. 선택한 책을 책 테이블에 저장합니다
       createdBooks = await Promise.all(
         bookItemDtos.map(async (item) => {
-          return this.prisma.book.create({
+          const book = await this.prisma.book.findFirst({
+            where: { isbn: item.isbn },
+          });
+          if (book) {
+            return book;
+          }
+          return await this.prisma.book.create({
             data: {
               title: item.title,
               author: item.author,
@@ -124,6 +183,7 @@ export class BookService {
         }),
       );
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException('book 등록 중 에러');
     }
 
@@ -131,7 +191,18 @@ export class BookService {
     try {
       selectedBookModels = await Promise.all(
         createdBooks.map(async (book) => {
-          return this.prisma.selectedBook.create({
+          const existingSelectedBook = await this.prisma.selectedBook.findFirst(
+            {
+              where: {
+                userId: parseInt(userId),
+                bookId: book.id,
+              },
+            },
+          );
+          if (existingSelectedBook) {
+            return;
+          }
+          return await this.prisma.selectedBook.create({
             data: {
               userId: parseInt(userId),
               bookId: book.id,
@@ -146,7 +217,6 @@ export class BookService {
     } catch (error) {
       throw new InternalServerErrorException('selectedBook 등록 중 에러');
     }
-
     const selectedBookDtos: SelectedBookDto[] = selectedBookModels.map(
       this.transformModelToSelectedBookDto,
     );
@@ -179,6 +249,35 @@ export class BookService {
     return selectedBookDtos;
   }
 
+  async deleteSelectedBookByUser(
+    selectedBookSeq: string,
+  ): Promise<SelectedBookDto> {
+    let selectedBookModel: SelectedBookModel;
+
+    try {
+      selectedBookModel = await this.prisma.selectedBook.delete({
+        where: {
+          selectedBookSeq: parseInt(selectedBookSeq),
+        },
+        include: {
+          book: true, // Book 테이블을 join
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'selectedBook 특정 책 삭제 중 에러',
+      );
+    }
+
+    if (!selectedBookModel) {
+      throw new NotFoundException('유저가 선택하여 저장한 책이 없습니다.');
+    }
+
+    const selectedBookDtos =
+      this.transformModelToSelectedBookDto(selectedBookModel);
+    return selectedBookDtos;
+  }
+
   async getBooksLikedByUser(userId: string): Promise<BookLikeDto[]> {
     let bookLikeModels: BookLikeModel[];
     try {
@@ -204,7 +303,6 @@ export class BookService {
     return bookLikeDtos;
   }
 
-  // TODO : 트랜잭션으로 묶기?
   async updateBookLike(bookId: string, userId: string): Promise<BookLikeModel> {
     const userIdInt = parseInt(userId);
     const bookIdInt = parseInt(bookId);
@@ -244,19 +342,33 @@ export class BookService {
     return this.transformModelToBookLikeDto(bookLikeModel);
   }
 
+  async getAllComments(): Promise<CommentDto[]> {
+    let commentModel: CommentModel[];
+
+    try {
+      commentModel = await this.prisma.comment.findMany();
+    } catch (error) {
+      throw new InternalServerErrorException('모든 comment 검색 중 에러 ');
+    }
+    if (!commentModel) {
+      throw new NotFoundException('등록된 코멘트가 없습니다.');
+    }
+
+    const commentDtos: CommentDto[] = commentModel.map(
+      this.transformModelToCommentDto,
+    );
+    return commentDtos;
+  }
+
   // 책에 코멘트 생성하기
-  async createCommentOnBook(
-    bookId: string,
-    comment: CreateCommentDto,
-    userId: string,
-  ): Promise<CommentDto> {
+  async createCommentOnBook(comment: CreateCommentDto): Promise<CommentDto> {
     let commentModel: CommentModel;
     try {
       commentModel = await this.prisma.comment.create({
         data: {
           content: comment.content,
-          book: { connect: { id: parseInt(bookId) } },
-          user: { connect: { id: parseInt(userId) } },
+          book: { connect: { id: parseInt(comment.bookId) } },
+          user: { connect: { id: parseInt(comment.userId) } },
         },
         include: {
           book: true,
