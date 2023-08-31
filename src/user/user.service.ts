@@ -61,7 +61,14 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const foundUserModel: UserModel = await this.getUser(createUserDto.email);
+    let foundUserModel: UserModel;
+    try {
+      foundUserModel = await this.prisma.user.findFirst({
+        where: { email: createUserDto.email },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('유저 검색 중 에러');
+    }
 
     // 이미 존재하는 유저 예외처리
     if (foundUserModel) {
@@ -74,7 +81,9 @@ export class UserService {
       });
       return this.transformUserModelsToDto(userModel);
     } catch (error) {
-      throw new InternalServerErrorException('유저 등록 중 에러');
+      throw new InternalServerErrorException(
+        '유저 등록 중 에러. 이미 등록된 providerId일 수 있습니다.',
+      );
     }
   }
 
@@ -96,7 +105,7 @@ export class UserService {
       });
       return this.transformUserModelsToDto(newUserModel);
     } catch (error) {
-      throw new InternalServerErrorException('유저 등록 중 에러');
+      throw new InternalServerErrorException('유저 등록 중 에러.');
     }
   }
 }
