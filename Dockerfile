@@ -29,4 +29,4 @@ COPY . .
 EXPOSE 3000
 
 # Command to run the application
-CMD npm run build && npm run start:prod
+CMD npx prisma generate && npm run build && npm run start:prod
