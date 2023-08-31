@@ -4,15 +4,15 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>소셜 로그인</title>
   </head>
-  <body>
-    <a href='http://localhost:3000/auth/oauth/to-kakao'>카카오 로그인</a>
-    <br />
-    <a href='http://localhost:3000/auth/test-guard'>로그인 확인</a>
-    <br />
-    <br />
-    <br />
+  <style>
+    .fieldset { margin: 15 5 15 5; } .testbox {border: 3px solid; margin: 20 10
+    20 10; padding: 10 10 10 10;} .responsebox {border: 1px dashed; margin: 10 5
+    10 5; padding: 10 10 10 10;} .testbox-link {margin: 10 5 10 5; padding: 10
+    10 10 10;}
+  </style>
 
-    <div style='border: 1px solid;'>
+  <body>
+    <div class='testbox'>
       MESSAGE:
       {{message}}
       <br />
@@ -22,6 +22,358 @@
       DATABASE_INFO:
       {{databaseInfo}}
     </div>
+    <div class='testbox'>
+      <h2>로그인 테스트</h2>
+      <div class='testbox-link'>
+        <a href='{{serviceUrl}}/auth/oauth/to-kakao'>카카오 로그인하기</a>
+      </div>
+      <div class='testbox-link'>
+        <a href='{{serviceUrl}}/auth/test-guard'>로그인 간단 확인(로그인된
+          사용자만 응답을 받습니다)</a>
+      </div>
+    </div>
+
+    <div class='testbox'>
+      <h2>책 서비스 테스트(로그인된 사용자만 응답을 받을 수 있습니다)</h2>
+      <form action='{{serviceUrl}}/books/search' method='get'>
+        <fieldset class='fieldset'>
+          <legend>검색어로 네이버 책 검색하기</legend>
+          <input type='text' name='query' placeholder='검색어를 입력하세요' />
+          <input type='submit' value='send' />
+        </fieldset>
+      </form>
+
+      <fieldset class='fieldset'>
+        <legend>유저가 선택한 책 리스트 저장하기</legend>
+        <p>JSON 예시1:
+          <br />
+          {"bookItemDtos": [{ "title": "test 책1", "link": "책 링크", "image":
+          "이미지 링크", "author": "test작가", "discount": "13350", "publisher":
+          "test출판사", "pubdate": "20211020", "isbn": "123123123123123123",
+          "description": "test 책입니다." }]}
+          <br /><br />JSON 예시2:
+          <br />{"bookItemDtos": [{ "title": "test 책1", "link": "책 링크",
+          "image": "이미지 링크", "author": "test작가", "discount": "13350",
+          "publisher": "test출판사", "pubdate": "20211020", "isbn":
+          "456456456456456", "description": "test 책입니다." }, { "title": "test
+          책2", "link": "책 링크", "image": "이미지 링크", "author": "test작가",
+          "discount": "13350", "publisher": "test출판사", "pubdate": "20211020",
+          "isbn": "789789789789789", "description": "test 책입니다2" }]}
+        </p>
+        <input
+          type='text'
+          id='userId-saved'
+          placeholder='userId를 입력하세요'
+        />
+        <br />
+        <textarea
+          type='text'
+          id='bookitemdtos'
+          placeholder='book item json 값'
+          rows='10'
+          required
+        ></textarea>
+        <button onclick='saveSelectedBooks()'>send</button>
+        <script>
+          function saveSelectedBooks() { const userId =
+          document.getElementById('userId-saved').value; const bookItems =
+          document.getElementById('bookitemdtos').value;
+          fetch(`/books/selected/${userId}`, { method: 'POST', headers: {
+          'Content-Type': 'application/json', }, body: bookItems, })
+          .then((response) => response.json()) .then( (data) =>
+          (document.getElementById('responseDisplay-savedbook').innerHTML =
+          JSON.stringify(data, null, 2)), ) .catch((error) => {
+          console.error('Error:', error); alert(error); }); }
+
+        </script>
+        <div id='responseDisplay-savedbook' class='responsebox'>응답이 보일 곳</div>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>유저가 저장한 책 리스트 조회하기</legend>
+        <input
+          type='text'
+          id='userId-selected'
+          placeholder='userId를 입력하세요'
+        />
+        <button onclick='goToSelectedBooks()'>send</button>
+        <script>
+          function goToSelectedBooks() { const userId =
+          document.getElementById("userId-selected").value; const serviceUrl = "{{serviceUrl}}";
+          window.location.href = `${serviceUrl}/books/selected/${userId}`; }
+        </script>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>유저가 저장한 특정 책 리스트에서 삭제</legend>
+        <input
+          type='text'
+          id='selectedBookSeq-selected-delete'
+          placeholder='selectedBookSeq를 입력하세요'
+        />
+        <button onclick='deleteSelectedBook()'>send</button>
+        <script>
+
+          function deleteSelectedBook() { const selectedBookSeq =
+          document.getElementById("selectedBookSeq-selected-delete").value;
+          fetch(`books/selected/${selectedBookSeq}`, { method: 'DELETE', })
+          .then((response) => response.json()) .then((data) => {
+          document.getElementById('responseDisplay-deleteselected').innerHTML =
+          JSON.stringify(data, null, 2); }) .catch((error) => {
+          console.error('Error:', error); alert(error); }); }
+
+        </script>
+        <div id='responseDisplay-deleteselected' class='responsebox'>응답이 보일
+          곳</div>
+
+      </fieldset>
+
+      <div class='testbox-link'>
+        <a href='{{serviceUrl}}/books'>DB에 저장된 모든 책 조회하기</a>
+      </div>
+
+      <fieldset class='fieldset'>
+        <legend>DB에 저장된 특정 책 삭제</legend>
+        <input
+          type='text'
+          id='bookId-delete'
+          placeholder='bookId를 입력하세요'
+        />
+        <button onclick='deleteBookByBookId()'>send</button>
+        <script>
+
+          function deleteBookByBookId() { const bookId =
+          document.getElementById("bookId-delete").value;
+          fetch(`books/${bookId}`, { method: 'DELETE', }) .then((response) =>
+          response.json()) .then((data) => {
+          document.getElementById('responseDisplay-deletebook').innerHTML =
+          JSON.stringify(data, null, 2); }) .catch((error) => {
+          console.error('Error:', error); alert(error); }); }
+
+        </script>
+        <div id='responseDisplay-deletebook' class='responsebox'>응답이 보일 곳</div>
+
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>책에 좋아요 누르기 & 취소하기</legend>
+        <input
+          type='text'
+          id='bookId-likes'
+          placeholder='bookId를 입력하세요'
+        />
+        <input
+          type='text'
+          id='userId-likes'
+          placeholder='userId를 입력하세요'
+        />
+        <button onclick='updateLikes()'>send</button>
+        <script>
+          function updateLikes() { const bookId =
+          document.getElementById('bookId-likes').value; const userId =
+          document.getElementById('userId-likes').value;
+          fetch(`books/${bookId}/likes/${userId}`, { method: 'PUT', })
+          .then((response) => response.json()) .then((data) => {
+          document.getElementById('responseDisplay-updatelikes').innerHTML =
+          JSON.stringify(data, null, 2); }) .catch((error) => {
+          console.error('Error:', error); alert(error); }); }
+        </script>
+        <div id='responseDisplay-updatelikes' class='responsebox'>응답이 보일 곳</div>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>유저가 좋아요 한 책 리스트 조회하기</legend>
+        <input
+          type='text'
+          id='userId-liked'
+          placeholder='userId를 입력하세요'
+        />
+        <button onclick='goToLikedBooks()'>send</button>
+        <script>
+          function goToLikedBooks() { const userId =
+          document.getElementById("userId-liked").value; const serviceUrl = "{{serviceUrl}}";
+          window.location.href = `${serviceUrl}/books/liked/${userId}`; }
+        </script>
+      </fieldset>
+    </div>
+
+    <div class='testbox'>
+      <h2>코멘트 서비스 테스트(로그인된 사용자만 응답을 받을 수 있습니다)</h2>
+      <div class='testbox-link'>
+        <a href='{{serviceUrl}}/books/comments'>모든 코멘트 보기</a>
+      </div>
+      <fieldset class='fieldset'>
+        <legend>책에 코멘트 생성하기</legend>
+        <input
+          type='text'
+          id='userId-createcomment'
+          placeholder='userId를 입력하세요'
+        />
+        <input
+          type='text'
+          id='bookId-createcomment'
+          placeholder='bookId를 입력하세요'
+        />
+        <textarea
+          type='text'
+          id='content-createcomment'
+          placeholder='comment 내용'
+          rows='5'
+          required
+        ></textarea>
+        <button onclick='createCommentOnBook()'>send</button>
+        <script>
+          function createCommentOnBook() { const userId =
+          document.getElementById('userId-createcomment').value; const bookId =
+          document.getElementById('bookId-createcomment').value; const content =
+          document.getElementById('content-createcomment').value;
+          fetch(`/books/${bookId}/comments`, { method: 'POST', headers: {
+          'Content-Type': 'application/json', }, body: JSON.stringify({ comment:
+          { content, userId, bookId } }), }) .then((response) =>
+          response.json()) .then((data) => {
+          document.getElementById('responseDisplay-createcomment').innerHTML =
+          JSON.stringify(data, null, 2); }) .catch((error) => {
+          console.error('Error:', error); alert(error); }); }
+        </script>
+        <div id='responseDisplay-createcomment' class='responsebox'>응답이 보일
+          곳</div>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>특정 책에 달린 코멘트 보기</legend>
+        <input
+          type='text'
+          id='bookId-getcomment'
+          placeholder='bookId를 입력하세요'
+        />
+        <button onclick='goToCommentOnBook()'>send</button>
+        <script>
+          function goToCommentOnBook() { const bookId =
+          document.getElementById("bookId-getcomment").value; const serviceUrl =
+          "{{serviceUrl}}"; window.location.href =
+          `${serviceUrl}/books/${bookId}/comments`; }
+        </script>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>책에 코멘트 수정하기</legend>
+        <input
+          type='text'
+          id='bookId-updatecomment'
+          placeholder='bookId를 입력하세요'
+        />
+        <input
+          type='text'
+          id='commentId-updatecomment'
+          placeholder='commentId를 입력하세요'
+        />
+        <textarea
+          type='text'
+          id='content-updatecomment'
+          placeholder='변경할 내용'
+          rows='5'
+          required
+        ></textarea>
+        <button onclick='updateCommentOnBook()'>send</button>
+        <script>
+          function updateCommentOnBook() { const bookId =
+          document.getElementById('bookId-updatecomment').value; const commentId
+          = document.getElementById('commentId-updatecomment').value; const
+          content = document.getElementById('content-updatecomment').value;
+          fetch(`books/${bookId}/comments/${commentId}`, { method: 'PUT',
+          headers: { 'Content-Type': 'application/json', }, body:
+          JSON.stringify({ comment: { content } }), }) .then((response) =>
+          response.json()) .then( (data) =>
+          (document.getElementById('responseDisplay-updatecomment').innerHTML =
+          JSON.stringify(data, null, 2)), ) .catch((error) => {
+          console.error('Error:', error); }); }
+        </script>
+        <div id='responseDisplay-updatecomment' class='responsebox'>응답이 보일
+          곳</div>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>특정 책의 코멘트 삭제하기</legend>
+        <input
+          type='text'
+          id='bookId-deletecomment'
+          placeholder='bookId를 입력하세요'
+        />
+        <input
+          type='text'
+          id='commentId-deletecomment'
+          placeholder='commentId를 입력하세요'
+        />
+        <button onclick='deleteCommentOnBook()'>send</button>
+        <script>
+          function deleteCommentOnBook() { const bookId =
+          document.getElementById('bookId-deletecomment').value; const commentId
+          = document.getElementById('commentId-deletecomment').value;
+          fetch(`books/${bookId}/comments/${commentId}`, { method: 'DELETE', })
+          .then((response) => response.json()) .then((data) => {
+          document.getElementById('responseDisplay-commentdelete').innerHTML =
+          JSON.stringify(data, null, 2); }) .catch((error) => {
+          console.error('Error:', error); alert(error); }); }
+        </script>
+        <div id='responseDisplay-commentdelete' class='responsebox'>응답이 보일
+          곳</div>
+
+      </fieldset>
+
+    </div>
+
+    <div class='testbox'>
+      <h2>유저 서비스 테스트(로그인된 사용자만 응답을 받을 수 있습니다)</h2>
+
+      <div class='testbox-link'>
+        <a href='{{serviceUrl}}/users'>등록된 전체 유저 불러오기</a>
+      </div>
+
+      <fieldset class='fieldset'>
+        <legend>이메일로 유저 식별하기</legend>
+        <p>예시:
+          <br />
+          100mgml@gmail.com
+        </p>
+        <input type='text' id='useremail' placeholder='이메일 입력하세요' />
+        <button onclick='goToGetUserByEmail()'>send</button>
+        <script>
+          function goToGetUserByEmail() { const email
+          =document.getElementById("useremail").value; const serviceUrl = "{{serviceUrl}}";
+          window.location.href = `${serviceUrl}/users/${email}`; }
+        </script>
+      </fieldset>
+
+      <fieldset class='fieldset'>
+        <legend>유저 강제 등록시키기</legend>
+        <p>예시:
+          <br />
+          { "username": "test유저", "email": "testtest@testtest.com",
+          "providerId": "123456789" }
+        </p>
+        <textarea
+          type='text'
+          id='user-create'
+          placeholder='JSON'
+          rows='5'
+          required
+        ></textarea>
+        <button onclick='registerUser()'>send</button>
+        <script>
+          function registerUser() { const user =
+          document.getElementById('user-create').value; fetch(`users`, { method:
+          'POST', headers: { 'Content-Type': 'application/json', }, body: user,
+          }) .then((response) => response.json()) .then( (data) =>
+          (document.getElementById('responseDisplay-usercreate').innerHTML =
+          JSON.stringify(data, null, 2)), ) .catch((error) => {
+          console.error('Error:', error); }); }
+
+        </script>
+        <div id='responseDisplay-usercreate' class='responsebox'>응답이 보일 곳</div>
+      </fieldset>
+
+    </div>
 
   </body>
+
 </html>
