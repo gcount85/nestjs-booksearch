@@ -43,6 +43,8 @@ env:
   CONTAINER_NAME:
     nestjsbooksearch # set this to the name of the container in the
     # containerDefinitions section of your task definition
+  DEV: ${{ secrets.DEV }}
+  PROD: ${{ secrets.PROD }}
 
 permissions:
   contents: read
@@ -56,6 +58,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Write config files
+        run: |
+          echo "$DEV" > envs/dev.env
+          echo "$PROD" > envs/prod.env
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
