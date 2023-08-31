@@ -11,7 +11,7 @@ export class KakaoOauthStrategy extends PassportStrategy(Strategy, 'kakao') {
     private configService: ConfigService,
     private userService: UserService,
   ) {
-    // 부모 클래스의 생성자를 호출
+    // 1. 카카오 oauth 파라미터 전달
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'), // REST API 키
       clientSecret: configService.get('KAKAO_CLIENT_SECRET'),
@@ -19,7 +19,7 @@ export class KakaoOauthStrategy extends PassportStrategy(Strategy, 'kakao') {
     });
   }
 
-  // OAuth 인증이 끝나고 콜백URL을 실행하기 전 유저 신원 검증하는 메서드
+  // OAuth 인증이 끝나고 콜백URL을 실행하기 전 유저 신원 검증
   async validate(
     accessToken: string,
     refreshToken: string,

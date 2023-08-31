@@ -63,7 +63,7 @@ function deleteCommentOnBook() {
     });
 }
 
-function deleteSelectedBook() {
+function deleteSelectedBookByBookSeq() {
   const selectedBookSeq = document.getElementById(
     'selectedBookSeq-selected-delete',
   ).value;

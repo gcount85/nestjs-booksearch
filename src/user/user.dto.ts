@@ -12,7 +12,7 @@ export class UserResponseDto {
 export class CreateUserDto {
   @IsEmail()
   email: string;
-  @IsNumberString() // TODO: 카카오 재가입해서 테스트 할 것
+  @IsNumberString()
   providerId: string;
   @IsNotEmpty()
   username: string;

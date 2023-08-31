@@ -1,7 +1,7 @@
 import { IsNumberString, ValidateNested } from 'class-validator';
 import { UserResponseDto } from 'src/user/user.dto';
 
-export class BookItemDTO {
+export class BookItemDto {
   title: string;
   link: string;
   image: string;
@@ -14,13 +14,13 @@ export class BookItemDTO {
   description: string;
 }
 
-export class BookItemsDTO {
+export class BookItemsDto {
   lastBuildDate: string;
   total: number;
   start: number;
   display: number;
   @ValidateNested()
-  items: BookItemDTO[];
+  items: BookItemDto[];
 }
 
 export class BookDto {

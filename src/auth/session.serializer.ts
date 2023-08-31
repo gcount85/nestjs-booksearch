@@ -7,10 +7,12 @@ export class SessionSerializer extends PassportSerializer {
   constructor(private userService: UserService) {
     super();
   }
+  /* 세션에 유저 정보 저장하기(이메일) */
   serializeUser(user: any, done: (err: Error, user: any) => void): any {
-    done(null, user.email); // 세션에 저장할 정보
+    done(null, user.email);
   }
 
+  /* 세션에 저장된 유저 정보 불러오기 */
   async deserializeUser(
     payload: string,
     done: (err: Error, user: any) => void,

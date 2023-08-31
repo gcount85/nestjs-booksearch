@@ -15,8 +15,8 @@ import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import {
   BookDto,
-  BookItemDTO,
-  BookItemsDTO,
+  BookItemDto,
+  BookItemsDto,
   BookLikeDto,
   SelectedBookDto,
 } from './book.dto';
@@ -39,6 +39,7 @@ export class BookService {
     private configService: ConfigService,
   ) {}
 
+  /* prisma의 BookModel response를 DTO로 변환 */
   transformModelToBookDto(bookModel: BookModel) {
     if (!bookModel) {
       return null;
@@ -52,6 +53,7 @@ export class BookService {
     return bookDto;
   }
 
+  /* prisma의 SelectedBookModel response를 DTO로 변환 */
   transformModelToSelectedBookDto(selectedBookModel: SelectedBookWithBookUser) {
     if (!selectedBookModel) {
       return null;
@@ -65,6 +67,7 @@ export class BookService {
     return selectedBookDto;
   }
 
+  /* prisma의 BookLikeModel response를 DTO로 변환 */
   transformModelToBookLikeDto(bookLikeModel: BookLikeModelWithBookUser) {
     if (!bookLikeModel) {
       return null;
@@ -78,6 +81,7 @@ export class BookService {
     return bookLikeDto;
   }
 
+  /* prisma의 CommentModel response를 DTO로 변환 */
   transformModelToCommentDto(commentModel: CommentModel) {
     if (!commentModel) {
       return null;
@@ -92,7 +96,8 @@ export class BookService {
     return commentDto;
   }
 
-  async searchNaverBooks(query: string): Promise<BookItemsDTO> {
+  /* 네이버 책 검색 API 호출 */
+  async searchNaverBooks(query: string): Promise<BookItemsDto> {
     try {
       const config = {
         headers: {
@@ -116,6 +121,7 @@ export class BookService {
     }
   }
 
+  /* DB에 저장된 모든 책 조회하기 */
   async getAllBooks() {
     let bookModels: BookModel[];
 
@@ -133,6 +139,7 @@ export class BookService {
     return bookDto;
   }
 
+  /* bookId로 특정 책 삭제하기 */
   async deleteBookByBookId(bookId: string) {
     let bookModel: BookModel;
 
@@ -156,8 +163,9 @@ export class BookService {
     return bookDto;
   }
 
+  /* 특정 유저가 선택한 책 리스트 저장하기 */
   async saveSelectedBookByUser(
-    bookItemDtos: BookItemDTO[],
+    bookItemDtos: BookItemDto[],
     userId: string,
   ): Promise<SelectedBookModel[]> {
     let createdBooks: BookModel[];
@@ -223,6 +231,7 @@ export class BookService {
     return selectedBookDtos;
   }
 
+  /* userId로 특정 유저가 저장한 책 리스트 조회하기 */
   async getSelectedBooksByUser(userId: string): Promise<SelectedBookDto[]> {
     let selectedBookModels: SelectedBookModel[];
 
@@ -249,7 +258,8 @@ export class BookService {
     return selectedBookDtos;
   }
 
-  async deleteSelectedBookByUser(
+  /* selectedBookSeq로 저장된 책 리스트의 특정 책 삭제하기 */
+  async deleteSelectedBookByBookSeq(
     selectedBookSeq: string,
   ): Promise<SelectedBookDto> {
     let selectedBookModel: SelectedBookModel;
@@ -278,6 +288,7 @@ export class BookService {
     return selectedBookDtos;
   }
 
+  /* userId로 특정 유저가 좋아요를 누른 책 리스트 반환하기 */
   async getBooksLikedByUser(userId: string): Promise<BookLikeDto[]> {
     let bookLikeModels: BookLikeModel[];
     try {
@@ -303,10 +314,12 @@ export class BookService {
     return bookLikeDtos;
   }
 
+  /* 특정 책의 좋아요를 업데이트하기 */
   async updateBookLike(bookId: string, userId: string): Promise<BookLikeModel> {
     const userIdInt = parseInt(userId);
     const bookIdInt = parseInt(bookId);
 
+    // 1. 이미 좋아요를 눌렀는지 검색 (유저-좋아요 관계 검색)
     let existingLike: BookLikeModel | null;
     try {
       existingLike = await this.prisma.bookLike.findFirst({
@@ -316,7 +329,7 @@ export class BookService {
       throw new InternalServerErrorException('bookLike 검색 중 에러');
     }
 
-    // 이미 좋아요를 눌렀으면 좋아요 취소
+    // 2. 이미 좋아요를 눌렀으면 좋아요 취소
     if (existingLike) {
       await this.prisma.bookLike.delete({
         where: { booklikeSeq: existingLike.booklikeSeq },
@@ -324,6 +337,7 @@ export class BookService {
       return this.transformModelToBookLikeDto(null);
     }
 
+    // 3. 좋아요를 누르지 않은 경우 좋아요 업데이트
     let bookLikeModel: BookLikeModel;
     try {
       bookLikeModel = await this.prisma.bookLike.create({
@@ -342,6 +356,7 @@ export class BookService {
     return this.transformModelToBookLikeDto(bookLikeModel);
   }
 
+  /* 등록된 모든 코멘트 불러오기 */
   async getAllComments(): Promise<CommentDto[]> {
     let commentModel: CommentModel[];
 
@@ -360,7 +375,7 @@ export class BookService {
     return commentDtos;
   }
 
-  // 책에 코멘트 생성하기
+  /* 특정 책에 코멘트 등록하기 */
   async createCommentOnBook(comment: CreateCommentDto): Promise<CommentDto> {
     let commentModel: CommentModel;
     try {
@@ -382,7 +397,7 @@ export class BookService {
     return commentDto;
   }
 
-  // 책에 달린 코멘트 보기
+  /* 특정 책에 등록된 코멘트 보기 */
   async getCommentsOnBook(bookId: string): Promise<CommentDto[]> {
     let commentModel: CommentModel[];
     try {
@@ -404,7 +419,7 @@ export class BookService {
     return commentDtos;
   }
 
-  // 책에 코멘트 수정하기
+  /* 특정 책에 등록된 코멘트 수정하기 */
   async updateCommentOnBook(
     commentId: string,
     comment: UpdateCommentDto,
@@ -426,7 +441,7 @@ export class BookService {
     return commentDto;
   }
 
-  // 책에 코멘트 삭제하기
+  /* 특정 책에 등록된 코멘트 삭제하기 */
   async deleteCommentOnBook(commentId: string): Promise<CommentDto> {
     let commentModel: CommentModel;
     try {

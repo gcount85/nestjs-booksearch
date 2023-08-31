@@ -12,6 +12,7 @@ import { UserResponseDto, CreateUserDto } from './user.dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  /* prisma 유저 모델 response를 DTO로 변환시킨다 */
   transformUserModelsToDto(userModel: UserModel): UserResponseDto | null {
     if (!userModel) {
       return null;
@@ -24,6 +25,7 @@ export class UserService {
     return userResponseDto;
   }
 
+  /* 등록된 전체 유저 불러오기 */
   async getAllUsers(): Promise<UserResponseDto[]> {
     let userModels: UserModel[] | null;
     try {
@@ -42,6 +44,7 @@ export class UserService {
     return userResponseDtos;
   }
 
+  /* 이메일로 유저 식별하기 */
   async getUser(email: string): Promise<UserResponseDto | null> {
     let userModel: UserModel | null;
 
@@ -60,6 +63,7 @@ export class UserService {
     return this.transformUserModelsToDto(userModel);
   }
 
+  /* 유저 생성하기 */
   async createUser(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     let foundUserModel: UserModel;
     try {
@@ -87,6 +91,7 @@ export class UserService {
     }
   }
 
+  /* 이미 존재하는 유저인지 확인 후 등록한다 */
   async findByEmailOrSave(
     email: string,
     username: string,

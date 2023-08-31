@@ -111,10 +111,10 @@
           id='selectedBookSeq-selected-delete'
           placeholder='selectedBookSeq를 입력하세요'
         />
-        <button onclick='deleteSelectedBook()'>send</button>
+        <button onclick='deleteSelectedBookByBookSeq()'>send</button>
         <script>
 
-          function deleteSelectedBook() { const selectedBookSeq =
+          function deleteSelectedBookByBookSeq() { const selectedBookSeq =
           document.getElementById("selectedBookSeq-selected-delete").value;
           fetch(`books/selected/${selectedBookSeq}`, { method: 'DELETE', })
           .then((response) => response.json()) .then((data) => {

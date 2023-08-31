@@ -8,16 +8,19 @@ import { AuthenticatedGuard } from 'src/auth/auth.guard';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  /* 등록된 전체 유저 불러오기 */
   @Get()
   async getAllUsers(): Promise<UserResponseDto[]> {
     return await this.userService.getAllUsers();
   }
 
+  /* 이메일로 유저 식별하기 */
   @Get(':email')
   async getUser(@Param('email') email: string): Promise<UserResponseDto> {
     return await this.userService.getUser(email);
   }
 
+  /* 유저 강제 등록하기 */
   @Post()
   async signupUser(
     @Body()
