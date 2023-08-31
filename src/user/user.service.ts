@@ -83,17 +83,20 @@ export class UserService {
     username: string,
     providerId: string,
   ): Promise<UserResponseDto> {
-    const foundUserModel: UserResponseDto = await this.getUser(email);
+    const foundUserModel: UserResponseDto = await this.prisma.user.findFirst({
+      where: { email },
+    });
     if (foundUserModel) {
       return foundUserModel;
     }
 
-    const newUser: UserResponseDto = await this.createUser({
-      email,
-      username,
-      providerId,
-    });
-
-    return newUser;
+    try {
+      const newUserModel: UserModel = await this.prisma.user.create({
+        data: { email, username, providerId },
+      });
+      return this.transformUserModelsToDto(newUserModel);
+    } catch (error) {
+      throw new InternalServerErrorException('유저 등록 중 에러');
+    }
   }
 }
