@@ -26,7 +26,10 @@ RUN npm install
 COPY . .
 
 # Expose the port the app will run on
-EXPOSE 3000
+EXPOSE 80
 
-# Command to run the application
-CMD npx prisma generate && npm run build && npm run start:prod
+# Shell script 복사
+COPY start-container.sh /start-container.sh
+RUN chmod +x /start-container.sh
+
+CMD ["/start-container.sh"]

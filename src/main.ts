@@ -31,8 +31,12 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  await app.listen(3000, () => {
-    console.log(`Server listening on ${configService.get('SERVICE_URL')}`);
-  });
+  await app.listen(
+    configService.get('SERVER_PORT'),
+    configService.get('SERVER_HOST'),
+    () => {
+      console.log(`Server listening on ${configService.get('SERVICE_URL')}`);
+    },
+  );
 }
 bootstrap();
