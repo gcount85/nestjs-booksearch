@@ -16,8 +16,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env: # 환경 변수 설정
-      COMMON: ${{ secrets.COMMON }}
-      LOCAL: ${{ secrets.LOCAL }}
       DEV: ${{ secrets.DEV }}
       PROD: ${{ secrets.PROD }}
 
@@ -41,9 +39,7 @@ jobs:
         run: npm run format
       - name: Write config files
         run: |
-          echo "$COMMON" > src/configs/common.ts
-          echo "$LOCAL" > src/configs/local.ts
-          echo "$DEV" > src/configs/dev.ts
-          echo "$PROD" > src/configs/prod.ts
+          echo "$DEV" > src/envs/dev.env
+          echo "$PROD" > src/envs/prod.env
       - name: Run build script
         run: npm run build --if-present
