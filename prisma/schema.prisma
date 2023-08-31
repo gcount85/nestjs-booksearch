@@ -35,7 +35,7 @@ model Book {
   id          Int       @default(autoincrement()) @id
   title       String
   author      String
-  isbn        String
+  isbn        String    @unique
   description String
   likedBy     BookLike[] // BookLike를 통해 User와 M:N 관계 
   selectedBy  SelectedBook[]
@@ -49,6 +49,7 @@ model BookLike {
   bookId      Int
   user        User @relation(fields: [userId], references: [id])
   book        Book @relation(fields: [bookId], references: [id])
+  @@unique([userId, bookId])
 }
 
 // User-Book 관계 테이블
@@ -58,4 +59,5 @@ model SelectedBook {
   bookId          Int
   user            User @relation(fields: [userId], references: [id])
   book            Book @relation(fields: [bookId], references: [id])
+  @@unique([userId, bookId])
 }
