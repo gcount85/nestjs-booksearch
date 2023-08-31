@@ -1,6 +1,5 @@
 # environment variables
-.env
-envs
+*.env
 common.ts
 local.ts
 dev.ts
