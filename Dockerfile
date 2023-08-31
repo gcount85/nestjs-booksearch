@@ -28,8 +28,5 @@ COPY . .
 # Expose the port the app will run on
 EXPOSE 80
 
-# Shell script 복사
-COPY start-container.sh /start-container.sh
-RUN chmod +x /start-container.sh
-
-CMD ["/start-container.sh"]
+# prisma init & start the app
+CMD npx prisma generate && npm run build && npm run start:prod 
