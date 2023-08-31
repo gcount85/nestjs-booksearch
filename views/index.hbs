@@ -22,20 +22,21 @@
       DATABASE_INFO:
       {{databaseInfo}}
     </div>
+
     <div class='testbox'>
       <h2>로그인 테스트</h2>
       <div class='testbox-link'>
-        <a href='{{serviceUrl}}/auth/oauth/to-kakao'>카카오 로그인하기</a>
+        <a href='/auth/oauth/to-kakao'>카카오 로그인하기</a>
       </div>
       <div class='testbox-link'>
-        <a href='{{serviceUrl}}/auth/test-guard'>로그인 간단 확인(로그인된
-          사용자만 응답을 받습니다)</a>
+        <a href='/auth/test-guard'>로그인 간단 확인(로그인된 사용자만 응답을
+          받습니다)</a>
       </div>
     </div>
 
     <div class='testbox'>
       <h2>책 서비스 테스트(로그인된 사용자만 응답을 받을 수 있습니다)</h2>
-      <form action='{{serviceUrl}}/books/search' method='get'>
+      <form action='/books/search' method='get'>
         <fieldset class='fieldset'>
           <legend>검색어로 네이버 책 검색하기</legend>
           <input type='text' name='query' placeholder='검색어를 입력하세요' />
@@ -99,8 +100,8 @@
         <button onclick='goToSelectedBooks()'>send</button>
         <script>
           function goToSelectedBooks() { const userId =
-          document.getElementById("userId-selected").value; const serviceUrl = "{{serviceUrl}}";
-          window.location.href = `${serviceUrl}/books/selected/${userId}`; }
+          document.getElementById("userId-selected").value; window.location.href
+          = `/books/selected/${userId}`; }
         </script>
       </fieldset>
 
@@ -129,7 +130,7 @@
       </fieldset>
 
       <div class='testbox-link'>
-        <a href='{{serviceUrl}}/books'>DB에 저장된 모든 책 조회하기</a>
+        <a href='/books'>DB에 저장된 모든 책 조회하기</a>
       </div>
 
       <fieldset class='fieldset'>
@@ -191,8 +192,8 @@
         <button onclick='goToLikedBooks()'>send</button>
         <script>
           function goToLikedBooks() { const userId =
-          document.getElementById("userId-liked").value; const serviceUrl = "{{serviceUrl}}";
-          window.location.href = `${serviceUrl}/books/liked/${userId}`; }
+          document.getElementById("userId-liked").value; window.location.href =
+          `/books/liked/${userId}`; }
         </script>
       </fieldset>
     </div>
@@ -200,7 +201,7 @@
     <div class='testbox'>
       <h2>코멘트 서비스 테스트(로그인된 사용자만 응답을 받을 수 있습니다)</h2>
       <div class='testbox-link'>
-        <a href='{{serviceUrl}}/books/comments'>모든 코멘트 보기</a>
+        <a href='/books/comments'>모든 코멘트 보기</a>
       </div>
       <fieldset class='fieldset'>
         <legend>책에 코멘트 생성하기</legend>
@@ -249,9 +250,8 @@
         <button onclick='goToCommentOnBook()'>send</button>
         <script>
           function goToCommentOnBook() { const bookId =
-          document.getElementById("bookId-getcomment").value; const serviceUrl =
-          "{{serviceUrl}}"; window.location.href =
-          `${serviceUrl}/books/${bookId}/comments`; }
+          document.getElementById("bookId-getcomment").value;
+          window.location.href = `/books/${bookId}/comments`; }
         </script>
       </fieldset>
 
@@ -326,7 +326,7 @@
       <h2>유저 서비스 테스트(로그인된 사용자만 응답을 받을 수 있습니다)</h2>
 
       <div class='testbox-link'>
-        <a href='{{serviceUrl}}/users'>등록된 전체 유저 불러오기</a>
+        <a href='/users'>등록된 전체 유저 불러오기</a>
       </div>
 
       <fieldset class='fieldset'>
@@ -339,8 +339,8 @@
         <button onclick='goToGetUserByEmail()'>send</button>
         <script>
           function goToGetUserByEmail() { const email
-          =document.getElementById("useremail").value; const serviceUrl = "{{serviceUrl}}";
-          window.location.href = `${serviceUrl}/users/${email}`; }
+          =document.getElementById("useremail").value; window.location.href =
+          `/users/${email}`; }
         </script>
       </fieldset>
 
