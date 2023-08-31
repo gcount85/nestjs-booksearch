@@ -7,11 +7,9 @@ export class AppService {
   root(): object {
     return {
       // 환경 별 환경변수 출력
-      message: this.configService.get('message'),
-      serviceUrl: this.configService.get('serviceUrl'),
-      logLevel: this.configService.get('logLevel'),
-      apiVersion: this.configService.get('apiVersion'),
-      dbInfo: this.configService.get('dbInfo'),
+      message: this.configService.get('MESSAGE'),
+      serviceUrl: this.configService.get('SERVICE_URL'),
+      databaseInfo: this.configService.get('DATABASE_INFO'),
     };
   }
 }

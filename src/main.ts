@@ -22,7 +22,7 @@ async function bootstrap() {
   // 세션 사용을 위한 설정
   app.use(
     session({
-      secret: configService.get('sessionSecret'),
+      secret: configService.get('SESSION_SECRET'),
       resave: false,
       saveUninitialized: false,
       cookie: { maxAge: 3600000 },
@@ -32,7 +32,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   await app.listen(3000, () => {
-    console.log(`Server listening on ${configService.get('serviceUrl')}`);
+    console.log(`Server listening on ${configService.get('SERVICE_URL')}`);
   });
 }
 bootstrap();

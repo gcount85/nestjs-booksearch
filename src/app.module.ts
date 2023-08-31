@@ -1,4 +1,3 @@
-import config from './configs/config';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,7 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaService } from './prisma/prisma.service';
 import { BookModule } from './book/book.module';
 
-console.log('env: ' + process.env.NODE_ENV);
+console.log('env 모드 : ' + process.env.NODE_ENV);
 
 @Module({
   imports: [
@@ -16,7 +15,7 @@ console.log('env: ' + process.env.NODE_ENV);
       isGlobal: true,
       cache: true,
       envFilePath: `${process.cwd()}/envs/${process.env.NODE_ENV}.env`,
-      load: [config],
+      expandVariables: true,
     }),
     UserModule,
     AuthModule,

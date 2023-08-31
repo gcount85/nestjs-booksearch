@@ -83,9 +83,9 @@ export class BookService {
     try {
       const config = {
         headers: {
-          'X-Naver-Client-Id': this.configService.get('naverBookClientId'),
+          'X-Naver-Client-Id': this.configService.get('NAVER_BOOK_CLIENT_ID'),
           'X-Naver-Client-Secret': this.configService.get(
-            'naverBookClientSecret',
+            'NAVER_BOOK_CLIENT_SECRET',
           ),
         },
       };

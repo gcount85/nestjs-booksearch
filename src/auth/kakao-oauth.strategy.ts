@@ -13,8 +13,8 @@ export class KakaoOauthStrategy extends PassportStrategy(Strategy, 'kakao') {
   ) {
     // 부모 클래스의 생성자를 호출
     super({
-      clientID: configService.get('kakaoClientId'), // REST API 키
-      clientSecret: configService.get('kakaoClientSecret'),
+      clientID: configService.get('KAKAO_CLIENT_ID'), // REST API 키
+      clientSecret: configService.get('KAKAO_CLIENT_SECRET'),
       callbackURL: 'http://localhost:3000/auth/oauth/kakao', // 카카오 OAuth 인증 후 실행되는 URL
     });
   }
