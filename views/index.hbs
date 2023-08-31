@@ -173,11 +173,15 @@
           function updateLikes() { const bookId =
           document.getElementById('bookId-likes').value; const userId =
           document.getElementById('userId-likes').value;
-          fetch(`books/${bookId}/likes/${userId}`, { method: 'PUT', })
-          .then((response) => response.json()) .then((data) => {
+          fetch(`books/${bookId}/likes/${userId}`, { method: 'PUT' })
+          .then((response) => { if (response.status === 204) {
           document.getElementById('responseDisplay-updatelikes').innerHTML =
-          JSON.stringify(data, null, 2); }) .catch((error) => {
+          '좋아요 취소'; return; } return response.json(); }) .then((data) => {
+          if (data) {
+          document.getElementById('responseDisplay-updatelikes').innerHTML =
+          JSON.stringify(data, null, 2); } }) .catch((error) => {
           console.error('Error:', error); alert(error); }); }
+
         </script>
         <div id='responseDisplay-updatelikes' class='responsebox'>응답이 보일 곳</div>
       </fieldset>

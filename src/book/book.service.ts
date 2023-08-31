@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -334,7 +336,7 @@ export class BookService {
       await this.prisma.bookLike.delete({
         where: { booklikeSeq: existingLike.booklikeSeq },
       });
-      return this.transformModelToBookLikeDto(null);
+      throw new HttpException(null, HttpStatus.NO_CONTENT);
     }
 
     // 3. 좋아요를 누르지 않은 경우 좋아요 업데이트
@@ -347,6 +349,7 @@ export class BookService {
         },
         include: {
           book: true,
+          user: true,
         },
       });
     } catch (error) {

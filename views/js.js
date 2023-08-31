@@ -124,14 +124,21 @@ function goToSelectedBooks() {
 function updateLikes() {
   const bookId = document.getElementById('bookId-likes').value;
   const userId = document.getElementById('userId-likes').value;
-
-  fetch(`books/${bookId}/likes/${userId}`, {
-    method: 'PUT',
-  })
-    .then((response) => response.json())
+  fetch(`books/${bookId}/likes/${userId}`, { method: 'PUT' })
+    .then((response) => {
+      if (response.status === 204) {
+        document.getElementById('responseDisplay-updatelikes').innerHTML =
+          '좋아요 취소';
+        return;
+      }
+      return response.json();
+    })
     .then((data) => {
-      document.getElementById('responseDisplay-updatelikes').innerHTML =
-        JSON.stringify(data, null, 2);
+      if (data) {
+        console.log(data);
+        document.getElementById('responseDisplay-updatelikes').innerHTML =
+          JSON.stringify(data, null, 2);
+      }
     })
     .catch((error) => {
       console.error('Error:', error);
