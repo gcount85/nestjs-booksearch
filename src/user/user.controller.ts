@@ -1,8 +1,10 @@
-import { Param, Controller, Get, Post, Body } from '@nestjs/common';
+import { Param, Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UserResponseDto } from './user.dto';
+import { AuthenticatedGuard } from 'src/auth/auth.guard';
 
 @Controller('users')
+@UseGuards(AuthenticatedGuard) // 클래스 레벨에 적용
 export class UserController {
   constructor(private userService: UserService) {}
 

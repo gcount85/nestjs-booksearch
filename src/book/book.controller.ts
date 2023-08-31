@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { CommentDto, CreateCommentDto, UpdateCommentDto } from './comment.dto';
@@ -16,8 +17,10 @@ import {
   BookLikeDto,
   SelectedBookDto,
 } from './book.dto';
+import { AuthenticatedGuard } from 'src/auth/auth.guard';
 
 @Controller('books')
+@UseGuards(AuthenticatedGuard) // 클래스 레벨에 적용
 export class BookController {
   constructor(private bookService: BookService) {}
 
