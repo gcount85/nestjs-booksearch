@@ -26,25 +26,38 @@
 
 네이버 책 검색을 활용한 백엔드 프로젝트
 
-## Installation
+## 실행 방법
+
+1. AWS에서 확인하기
+
+http://18.208.146.49/
+
+2. 로컬에서 실행하기 (postgresql이 설치되어 있어야 합니다.)
+- 우분투 환경 최초 실행시
 
 ```bash
-$ npm install
+npm i && sudo service postgresql start && npx prisma generate && npm run start:dev
 ```
 
-## Running the app
+- 이후 실행시
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run start:dev
 ```
 
+- 윈도우 최초 실행 시
+
+```bash
+npm i
+npx prisma generate
+npm run start:dev:win
+```
+
+- 이후 실행 시
+
+```bash
+npm run start:dev:win
+```
 ## Support
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
